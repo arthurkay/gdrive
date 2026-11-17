@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Off so the app can read and write a sync folder anywhere on disk. -->
+	<key>com.apple.security.app-sandbox</key>
+	<false/>
+	<key>com.apple.security.cs.allow-jit</key>
+	<true/>
+	<!-- Google Drive API calls. -->
+	<key>com.apple.security.network.client</key>
+	<true/>
+	<!-- Loopback listener that receives the OAuth redirect. -->
+	<key>com.apple.security.network.server</key>
+	<true/>
+	<!-- Keychain storage for the OAuth tokens (flutter_secure_storage). -->
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)zm.co.www.gdrive</string>
+	</array>
+</dict>
+</plist>

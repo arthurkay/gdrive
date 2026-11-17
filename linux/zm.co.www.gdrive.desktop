@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=GDrive
+Comment=Browse, preview and sync Google Drive
+Exec=gdrive
+Icon=zm.co.www.gdrive
+Categories=Network;FileTransfer;Utility;
+StartupWMClass=zm.co.www.gdrive
+Terminal=false
