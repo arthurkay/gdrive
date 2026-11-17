@@ -68,6 +68,7 @@ Future<ProviderContainer> pumpGDrive(
   Widget? home,
   ViewerFactory? viewers,
   List<Override> extra = const [],
+  Widget Function(Widget app)? wrap,
 }) async {
   silencePluginChannels();
   tester.view.physicalSize = const Size(1280, 800);
@@ -90,7 +91,9 @@ Future<ProviderContainer> pumpGDrive(
   await tester.pumpWidget(
     UncontrolledProviderScope(
       container: container,
-      child: home == null ? const GDriveApp() : GDriveApp(home: home),
+      child: (wrap ?? (app) => app)(
+        home == null ? const GDriveApp() : GDriveApp(home: home),
+      ),
     ),
   );
   await settle(tester);

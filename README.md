@@ -4,6 +4,9 @@ A desktop client for Google Drive on Windows, macOS and Linux. Browse your Drive
 
 Package id: `zm.co.www.gdrive`.
 
+![Thumbnail view of a synced Pictures folder, with the details panel showing the selected picture](docs/screenshots/thumbnails.png)
+
+- [Screenshots](#screenshots)
 - [What it can do](#what-it-can-do)
 - [Running it](#running-it)
   - [1. Install the prerequisites](#1-install-the-prerequisites)
@@ -17,6 +20,20 @@ Package id: `zm.co.www.gdrive`.
 - [Where your data lives](#where-your-data-lives)
 - [For developers](#for-developers)
 - [Not built yet](#not-built-yet)
+
+## Screenshots
+
+All taken from the demo build on Linux, so the files shown are sample data.
+
+| | |
+|---|---|
+| **List view** with the details panel<br>![My Drive as a sortable list](docs/screenshots/browse.png) | **Dark theme**<br>![Thumbnail view in the dark theme](docs/screenshots/dark.png) |
+| **PDF viewer**<br>![A PDF open in the built-in viewer](docs/screenshots/preview-pdf.png) | **Image viewer**<br>![A picture open in the built-in viewer](docs/screenshots/preview-image.png) |
+| **Text and code editor**<br>![A Dart file with syntax highlighting](docs/screenshots/preview-code.png) | **Sync activity**<br>![Log of files sync has downloaded](docs/screenshots/activity.png) |
+| **Transfers**<br>![Finished downloads listed with their sizes](docs/screenshots/transfers.png) | **Settings**<br>![Account, sync, appearance and storage settings](docs/screenshots/settings.png) |
+| **Sign-in**<br>![Sign-in page with the GDrive logo](docs/screenshots/sign-in.png) | **Windows look** (Fluent), rendered on Linux<br>![The same Drive in the Fluent shell](docs/screenshots/windows-look.png) |
+
+The Windows look above is the Fluent shell running on Linux, so the title bar is Linux's; there is no macOS screenshot because that shell depends on native macOS window effects.
 
 ## What it can do
 
@@ -152,7 +169,7 @@ If you run without `--dart-define-from-file`, the app opens on a page that repea
 flutter run -d linux --dart-define=DEMO=true
 ```
 
-Runs against an in-memory Drive with sample files, using its own database and sync folder. Nothing touches a real account, and everything resets each time it starts.
+Runs against an in-memory Drive with sample folders, pictures and documents. Its database and sync folder live in a `gdrive-demo` folder under the system temp directory. Nothing touches a real account, and everything resets each time it starts.
 
 To see another platform's look on your machine, add `UI_KIT`:
 
@@ -253,7 +270,8 @@ lib/
     preview/           viewer routing and the built-in viewers
     settings/
   dev/                 in-memory Drive and sign-in for demo mode and tests
-tool/                  logo generator, coverage summary
+tool/                  logo generator, coverage summary, screenshot script
+docs/screenshots/      images used in this README
 ```
 
 - **State**: Riverpod notifiers; no global singletons.
@@ -284,6 +302,15 @@ After changing the logo design in `tool/make_logo.py` (writes `assets/`, the mac
 ```sh
 python3 tool/make_logo.py
 ```
+
+To retake the README screenshots (Linux, with an unlocked desktop, `xwininfo` and ImageMagick):
+
+```sh
+tool/screenshots.sh              # all of them
+tool/screenshots.sh browse dark  # only the named ones
+```
+
+The script starts the demo build once per shot with a scene in `GDRIVE_DEMO_SCENE`, which tells the demo what to open; `GDRIVE_UI_KIT` picks the shell. The scene options are documented in `lib/dev/demo_director.dart`.
 
 `fluent_ui` is pinned to 4.15.1 because later versions need a newer Flutter than 3.41; raise the pin when upgrading Flutter.
 

@@ -119,11 +119,15 @@ class _ImageViewerState extends State<ImageViewer> {
               transformationController: _transform,
               minScale: 0.25,
               maxScale: 8,
-              child: Center(
+              // Fill the window, so small pictures are scaled up to fit and
+              // large ones scaled down.
+              child: SizedBox.expand(
                 child: RotatedBox(
                   quarterTurns: _quarterTurns,
                   child: Image.file(
                     widget.file,
+                    fit: BoxFit.contain,
+                    filterQuality: FilterQuality.medium,
                     errorBuilder: (_, _, _) => Text(
                       'This image could not be displayed',
                       style: style.caption,
@@ -224,6 +228,20 @@ class SeekBar extends StatelessWidget {
   }
 }
 
+/// Fixed-width fonts to try, covering what each desktop ships with. The
+/// generic "monospace" name is not resolved on every platform.
+const monospaceFonts = [
+  'JetBrains Mono',
+  'Ubuntu Mono',
+  'DejaVu Sans Mono',
+  'Cascadia Mono',
+  'Consolas',
+  'Menlo',
+  'SF Mono',
+  'Courier New',
+  'monospace',
+];
+
 // ---- text -----------------------------------------------------------------
 
 class TextPane extends StatefulWidget {
@@ -267,8 +285,9 @@ class _TextPaneState extends State<TextPane> {
       autofocus: true,
       onChanged: (_) => widget.onChanged(_controller.text),
       style: CodeEditorStyle(
-        fontSize: 13.5,
-        fontFamily: 'monospace',
+        fontSize: 14,
+        fontFamily: monospaceFonts.first,
+        fontFamilyFallback: monospaceFonts,
         fontHeight: 1.45,
         textColor: style.text,
         backgroundColor: style.background,
@@ -288,7 +307,10 @@ class _TextPaneState extends State<TextPane> {
           DefaultCodeLineNumber(
             controller: editing,
             notifier: notifier,
-            textStyle: style.caption.copyWith(fontFamily: 'monospace'),
+            textStyle: style.caption.copyWith(
+              fontFamily: monospaceFonts.first,
+              fontFamilyFallback: monospaceFonts,
+            ),
           ),
       findBuilder: (context, controller, readOnly) =>
           _FindPanel(controller: controller),

@@ -16,6 +16,7 @@ import 'core/db/database.dart';
 import 'core/platform/ui_kit.dart';
 import 'core/platform/window.dart';
 import 'dev/demo.dart';
+import 'dev/demo_director.dart';
 import 'features/settings/settings.dart';
 
 /// `--dart-define=DEMO=true` runs against an in-memory Drive, with its own
@@ -28,7 +29,9 @@ Future<void> main() async {
 
   var paths = await AppPaths.resolve();
   if (_demo) {
-    final dir = p.join(paths.cache, 'demo');
+    // A neutral temp location: throwaway data, and no home folder name in
+    // paths the UI shows.
+    final dir = p.join(Directory.systemTemp.path, 'gdrive-demo');
     final old = Directory(dir);
     if (await old.exists()) await old.delete(recursive: true);
     paths = AppPaths(
@@ -49,7 +52,14 @@ Future<void> main() async {
   await db.failInterruptedTransfers();
   final settings = await AppSettings.load(db, paths);
 
-  final kit = detectUiKit();
+  // The demo can also be steered at run time, so one build can show every
+  // view and every kit (see tool/screenshots.sh).
+  final env = Platform.environment;
+  final scene = DemoScene.parse(_demo ? env['GDRIVE_DEMO_SCENE'] : null);
+  final demoDrive = _demo ? seededDrive() : null;
+  final kit = _demo && env['GDRIVE_UI_KIT'] != null
+      ? detectUiKit(override: env['GDRIVE_UI_KIT']!)
+      : detectUiKit();
   final ownTitleBar = kit == UiKit.yaru && Platform.isLinux;
   await initWindow(db);
   if (ownTitleBar) await YaruWindowTitleBar.ensureInitialized();
@@ -64,9 +74,16 @@ Future<void> main() async {
         initialSettingsProvider.overrideWithValue(settings),
         uiKitProvider.overrideWithValue(kit),
         customTitleBarProvider.overrideWithValue(ownTitleBar),
-        if (_demo) ...demoOverrides(),
+        if (_demo)
+          ...demoOverrides(drive: demoDrive, signedIn: !scene.signedOut),
       ],
-      child: const GDriveApp(),
+      child: demoDrive == null || scene.isEmpty
+          ? const GDriveApp()
+          : DemoDirector(
+              scene: scene,
+              drive: demoDrive,
+              child: const GDriveApp(),
+            ),
     ),
   );
 }
